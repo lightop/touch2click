@@ -9,6 +9,60 @@ pyautogui.PAUSE = 0
 pyautogui.FAILSAFE = True
 PRESSED = 0
 POS = 724
+PREFIX = "mq"
+
+def gen_osc_addr (type, number):
+  osc_addr = "/" + PREFIX + "/" + type +"/"+str(number)
+  return (osc_addr)
+
+
+
+class TTCButton ():
+
+  def __init__(self,number,x,y):
+    print (number)
+    self.number = number
+    self.x = x
+    self.y = y
+    self.type = "b"
+    self.osc_addr = gen_osc_addr(self.type, self.number)
+    print (self.osc_addr)
+    dispatcher.map (self.osc_addr, self.handler, x, y )
+
+  def handler (self, unused_addr,args, volume):
+    if volume == 1.0 :
+      print (args[0])
+      print (args[1])
+      pyautogui.click (args[0], args[1])
+
+class TTCSlider ():
+  
+  def __init__(self, number, x, y_bottom, y_top):
+    self.number = number
+    self.x = x
+    self.y_bottom = y_bottom
+    self.y_top = y_top
+    self.height = self.y_bottom - self.y_top
+    self.type = "fader"
+    self.level = 0
+    self.osc_addr = gen_osc_addr (self.type, self.number)
+    dispatcher.map (self.osc_addr, self.handler, self.x, self.y_bottom)
+    dispatcher.map (self.osc_addr+"/z",self.handler_z, self.x, self.y_bottom)
+
+  def handler (self, unused_addr, args, volume):
+    pyautogui.moveTo(self.x,self.y_bottom-volume*self.height)
+    self.level = volume*self.height
+
+  def handler_z (self, unused_addr,args, volume):
+    if (volume == 1): 
+      pyautogui.mouseDown(self.x,self.y_bottom-self.level)
+    
+
+    if (volume ==0):
+      pyautogui.mouseUp()
+
+
+
 
 
 def s_handler(unused_addr, args, volume):
@@ -27,20 +81,6 @@ def sb_handler(unused_addr,args,volume):
 def go_handler(unused_addr,args,volume):
   if (volume == 1.0):
     pyautogui.click(args[0], 586)
-
-def ft_handler (unused_addr, args,volume):
-  #print (volume)
-  #print ("***")
-  if (volume == 1): 
-    pyautogui.mouseDown(128,724-volume)
-    print ("Down")
-
-  if (volume ==0):
-    pyautogui.mouseUp()
-    print ("Up")
-
-def f_handler (unused_addr, args,volume):
-  pyautogui.moveTo(128,724-volume)
   
 def b_handler (unused_addr,args,volume):
   #print (args[0], args[1])
@@ -78,13 +118,6 @@ def w_handler (unused_addr,args,volume):
     except (RuntimeError,ValueError): pass
       
 
-
-
-def print_compute_handler(unused_addr, args, volume):
-  try:
-    print("[{0}] ~ {1}".format(args[0], args[1](volume)))
-  except ValueError: pass
-
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--ip",
@@ -93,12 +126,15 @@ if __name__ == "__main__":
       type=int, default=8000, help="The port to listen on")
   args = parser.parse_args()
   dispatcher = dispatcher.Dispatcher()
-  for x in range (0,9):
-      y = 128+x*97
-      dispatcher.map("/mq/s/"+str(x+1), s_handler, y)
-      dispatcher.map("/mq/fader/"+str(x+1)+"/z", ft_handler, y)
-      dispatcher.map("/mq/fader/"+str(x+1), f_handler, y)
-      dispatcher.map("/mq/go/"+str(x+1),go_handler, y)
+  
+  faders = []
+  for x in range(0,9):
+    print (x)
+    yx = 128+x*97
+    f= TTCSlider (x+1, yx, 724, 634)
+    faders.append (f)
+
+
 
   for x in range (0,11):
       y = 128+x*80
@@ -142,6 +178,12 @@ if __name__ == "__main__":
     for y in range (0,6):
       dispatcher.map("/mq/b/"+str(i), b_handler, 1165+30*y, 245+30*x)
       i=i+1
+
+bb = TTCButton (1, 100, 50)
+bbb = TTCButton (2, 34, 45)
+
+#ss = TTCSlider (1, 10, 14, 15)
+
 
 loop = asyncio.get_event_loop()
 server = osc_server.AsyncIOOSCUDPServer((args.ip, args.port), dispatcher, loop)
