@@ -20,13 +20,11 @@ def gen_osc_addr (type, number):
 class TTCButton ():
 
   def __init__(self,number,x,y):
-    print (number)
     self.number = number
     self.x = x
     self.y = y
     self.type = "b"
     self.osc_addr = gen_osc_addr(self.type, self.number)
-    print (self.osc_addr)
     dispatcher.map (self.osc_addr, self.handler, x, y )
 
   def handler (self, unused_addr,args, volume):
@@ -34,6 +32,7 @@ class TTCButton ():
       print (args[0])
       print (args[1])
       pyautogui.click (args[0], args[1])
+
 
 class TTCSlider ():
   
@@ -62,15 +61,57 @@ class TTCSlider ():
       pyautogui.mouseUp()
 
 
+class TTCEncoder ():
 
+  def __init__(self, number,x,y):
+
+    self.number = number
+    self.x = x
+    self.y = y
+    self.type = "e"
+    self.osc_addr = gen_osc_addr(self.type, self.number)
+    dispatcher.map (self.osc_addr, self.handler,self.x, self.y)
+    dispatcher.map (self.osc_addr+"/z", self.handler_z, self.x, self.y)
+
+  def handler(self,unused_addr,args,volume):
+    if (volume == 1.0):
+      try:
+        pyautogui.moveRel(0,1)
+      except (RuntimeError,ValueError): pass
+    
+    if (volume == 0.0):
+      try:
+        pyautogui.moveRel(0,-1)
+      except (RuntimeError,ValueError): pass
+
+  def handler_z(self, unused_addr, args, volume):
+    
+    if (volume == 1.0):
+      try:
+        pyautogui.mouseDown (args[0], args[1])
+      except (RuntimeError,ValueError): pass
+    
+    if (volume == 0.0):
+      try:
+        pyautogui.mouseUp()
+      except (RuntimeError,ValueError): pass
+
+
+class TTCKey ():
+
+  def __init__(self,number,key):
+    self.number = number
+    self.key = key
+    self.type = "b"
+    self.osc_addr = gen_osc_addr(self.type, self.number)
+    dispatcher.map (self.osc_addr, self.handler, self.key )
+
+  def handler (self, unused_addr,args, volume):
+    if volume == 1.0 :
+      pyautogui.hotkey(args[0], args[1])
 
 
 def s_handler(unused_addr, args, volume):
-  #print("[{0}] ~ {1}".format(args[0], volume))
-  #a = round (724-90*volume)
-  #pyautogui.moveTo (128,a+1)
-  #pyautogui.dragTo (128,a)
-  #print (args[0])
   pyautogui.click(args[0],559)
 
 def sb_handler(unused_addr,args,volume):
@@ -179,10 +220,6 @@ if __name__ == "__main__":
       dispatcher.map("/mq/b/"+str(i), b_handler, 1165+30*y, 245+30*x)
       i=i+1
 
-bb = TTCButton (1, 100, 50)
-bbb = TTCButton (2, 34, 45)
-
-#ss = TTCSlider (1, 10, 14, 15)
 
 
 loop = asyncio.get_event_loop()
