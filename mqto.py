@@ -49,14 +49,14 @@ class TTCSlider ():
     dispatcher.map (self.osc_addr+"/z",self.handler_z, self.x, self.y_bottom)
 
   def handler (self, unused_addr, args, volume):
-    pyautogui.moveTo(self.x,self.y_bottom-volume*self.height)
     self.level = volume*self.height
+    pyautogui.moveTo(self.x,self.y_bottom-self.level)
+    
 
   def handler_z (self, unused_addr,args, volume):
     if (volume == 1): 
       pyautogui.mouseDown(self.x,self.y_bottom-self.level)
-    
-
+      
     if (volume ==0):
       pyautogui.mouseUp()
 
@@ -64,7 +64,6 @@ class TTCSlider ():
 class TTCEncoder ():
 
   def __init__(self, number,x,y):
-
     self.number = number
     self.x = x
     self.y = y
@@ -170,7 +169,6 @@ if __name__ == "__main__":
   
   faders = []
   for x in range(0,9):
-    print (x)
     yx = 128+x*97
     f= TTCSlider (x+1, yx, 724, 634)
     faders.append (f)
