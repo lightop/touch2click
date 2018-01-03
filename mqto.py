@@ -179,12 +179,12 @@ if __name__ == "__main__":
   
   faders = []
   for x in faderData:
-    f= TTCSlider (x[0], x[1], x[2], x[3], x[4])
+    f= TTCSlider (*x)
     faders.append (f)
 
   encoders =[]
   for x in encoderData:
-    e = TTCEncoder (x[0], x[1], x[2])
+    e = TTCEncoder (*x)
     encoders.append (e)
 
 
