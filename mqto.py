@@ -39,8 +39,60 @@ encoderData = [
 
               ]
 
+buttonData = [
+              
+              ('select1',128,559),
+              ('select2',225,559),
+              ('select3',322,559),
+              ('select4',419,559),
+              ('select5',516,559),
+              ('select6',613,559),
+              ('select7',710,559),
+              ('select8',807,559),
+              ('select9',904,559),
+              ('select10',1001,559),
+
+              ('go1', 128,586),
+              ('go2', 225,586),
+              ('go3', 322,586),
+              ('go4', 419,586),
+              ('go5', 516,586),
+              ('go6', 613,586),
+              ('go7', 710,586),
+              ('go8', 807,586),
+              ('go9', 904,586),
+              ('go10', 1001,586),
+
+              ('pause1', 128,586),
+              ('pause2', 128,586),
+              ('pause3', 128,586),
+              ('pause4', 128,586),
+              ('pause5', 128,586),
+              ('pause6', 128,586),
+              ('pause7', 128,586),
+              ('pause8', 128,586),
+              ('pause9', 128,586),
+              ('pause10', 128,586),
+
+              ('flash1', 128,586),
+              ('flash2', 128,586),
+              ('flash3', 128,586),
+              ('flash4', 128,586),
+              ('flash5', 128,586),
+              ('flash6', 128,586),
+              ('flash7', 128,586),
+              ('flash8', 128,586),
+              ('flash9', 128,586),
+              ('flash10', 128,586),
+              
+
+              
+
+]
+
 def gen_osc_addr (type, number):
   osc_addr = "/" + PREFIX + "/" + type +"/"+str(number)
+  print (osc_addr)
   return (osc_addr)
 
 
@@ -51,7 +103,7 @@ class TTCButton ():
     self.number = number
     self.x = x
     self.y = y
-    self.type = "b"
+    self.type = "button"
     self.osc_addr = gen_osc_addr(self.type, self.number)
     dispatcher.map (self.osc_addr, self.handler, x, y )
 
@@ -142,9 +194,6 @@ class TTCKey ():
       pyautogui.hotkey(args[0], args[1])
 
 
-def s_handler(unused_addr, args, volume):
-  pyautogui.click(args[0],559)
-
 def sb_handler(unused_addr,args,volume):
   #print (args[0])
   #print (PRESSED)
@@ -187,6 +236,10 @@ if __name__ == "__main__":
     e = TTCEncoder (*x)
     encoders.append (e)
 
+  buttons = []
+  for x in buttonData:
+    b = TTCButton (*x)
+    buttons.append(b)
 
   for x in range (0,11):
       y = 128+x*80
