@@ -4,12 +4,40 @@ import pyautogui
 from pythonosc import dispatcher
 from pythonosc import osc_server
 import asyncio
+import netifaces
 
 pyautogui.PAUSE = 0
 pyautogui.FAILSAFE = True
 PRESSED = 0
 POS = 724
 PREFIX = "mq"
+
+faderData = [
+              (1,128,726,128,634),
+              (2,225,726,225,634),
+              (3,322,726,322,634),
+              (4,419,726,419,634),
+              (5,516,726,516,634),
+              (6,613,726,613,634),
+              (7,710,726,710,634),
+              (8,807,726,807,634),
+              (9,904,726,904,634),
+              (10,1001,726,1001,634),
+
+              ]
+
+encoderData = [
+
+              (1,40,172),
+              (2,40,262),
+              (3,40,352),
+              (4,40,442),
+              (5,1092,172),
+              (6,1092,262),
+              (7,1092,352),
+              (8,1092,442),
+
+              ]
 
 def gen_osc_addr (type, number):
   osc_addr = "/" + PREFIX + "/" + type +"/"+str(number)
@@ -36,26 +64,30 @@ class TTCButton ():
 
 class TTCSlider ():
   
-  def __init__(self, number, x, y_bottom, y_top):
+  def __init__(self, number, x_zero, y_zero, x_full, y_full):
     self.number = number
-    self.x = x
-    self.y_bottom = y_bottom
-    self.y_top = y_top
-    self.height = self.y_bottom - self.y_top
+    self.x_zero = x_zero
+    self.y_zero = y_zero
+    self.x_full = x_full
+    self.y_full = y_full
+    self.y_size = self.y_zero - self.y_full
+    self.x_size = self.x_zero - self.x_full
     self.type = "fader"
-    self.level = 0
+    self.x_level = 0
+    self.y_level = 0
     self.osc_addr = gen_osc_addr (self.type, self.number)
-    dispatcher.map (self.osc_addr, self.handler, self.x, self.y_bottom)
-    dispatcher.map (self.osc_addr+"/z",self.handler_z, self.x, self.y_bottom)
+    dispatcher.map (self.osc_addr, self.handler, self.x_zero, self.y_zero)
+    dispatcher.map (self.osc_addr+"/z",self.handler_z, self.x_zero, self.y_zero)
 
   def handler (self, unused_addr, args, volume):
-    self.level = volume*self.height
-    pyautogui.moveTo(self.x,self.y_bottom-self.level)
+    self.y_level = volume*self.y_size
+    self.x_level = volume*self.x_size
+    pyautogui.moveTo(self.x_zero - self.x_level, self.y_zero-self.y_level)
     
 
   def handler_z (self, unused_addr,args, volume):
     if (volume == 1): 
-      pyautogui.mouseDown(self.x,self.y_bottom-self.level)
+      pyautogui.mouseDown(self.x_zero - self.x_level,self.y_zero - self.y_level)
       
     if (volume ==0):
       pyautogui.mouseUp()
@@ -67,7 +99,7 @@ class TTCEncoder ():
     self.number = number
     self.x = x
     self.y = y
-    self.type = "e"
+    self.type = "encoder"
     self.osc_addr = gen_osc_addr(self.type, self.number)
     dispatcher.map (self.osc_addr, self.handler,self.x, self.y)
     dispatcher.map (self.osc_addr+"/z", self.handler_z, self.x, self.y)
@@ -133,29 +165,7 @@ def wb_handler (unused_addr,args,volume):
     pyautogui.click (120, args[0])
     #print (args[0])
 
-def wt_handler (unused_addr,args,volume):
-  if (volume == 1.0):
-    try:
-      pyautogui.mouseDown (40,args[0])
-    except (RuntimeError,ValueError): pass
-  if (volume == 0.0):
-    try:
-      pyautogui.mouseUp()
-    except (RuntimeError,ValueError): pass
 
-def w_handler (unused_addr,args,volume):
-  if (volume == 1.0):
-    try:
-      #pyautogui.mouseDown (40,172)
-      pyautogui.moveRel(0,1)
-      #pyautogui.mouseUp()
-    except (RuntimeError,ValueError): pass
-  if (volume == 0.0):
-    try:
-        ##pyautogui.mouseDown(40,172)
-      pyautogui.moveRel(0,-1)
-      #pyautogui.mouseUp()
-    except (RuntimeError,ValueError): pass
       
 
 if __name__ == "__main__":
@@ -168,11 +178,14 @@ if __name__ == "__main__":
   dispatcher = dispatcher.Dispatcher()
   
   faders = []
-  for x in range(0,9):
-    yx = 128+x*97
-    f= TTCSlider (x+1, yx, 724, 634)
+  for x in faderData:
+    f= TTCSlider (x[0], x[1], x[2], x[3], x[4])
     faders.append (f)
 
+  encoders =[]
+  for x in encoderData:
+    e = TTCEncoder (x[0], x[1], x[2])
+    encoders.append (e)
 
 
   for x in range (0,11):
@@ -183,10 +196,6 @@ if __name__ == "__main__":
     y=150+x*40
     dispatcher.map("/mq/wb/"+str(x+1),wb_handler,y)
 
-  for x in range (0,4):
-    y = 172+x*90
-    dispatcher.map("/mq/wheel/"+str(x+1),w_handler, y)
-    dispatcher.map("/mq/wheel/"+str(x+1)+"/z", wt_handler,y)
 
   i=1
   for x in range (0,5):
