@@ -8,8 +8,6 @@ import netifaces
 
 pyautogui.PAUSE = 0.01
 pyautogui.FAILSAFE = True
-PRESSED = 0
-POS = 724
 PREFIX = "mq"
 
 faderData = [
@@ -165,7 +163,7 @@ buttonData = [
 
               ('rel',1126,500),
               ('sel',1156,500),
-              ('clr',2286,500),
+              ('clr',1186,500),
               ('shit',1126,530),
               ('blind',1156,530),
               ('backspace',1186,530),
@@ -226,8 +224,6 @@ class TTCButton ():
 
   def handler (self, unused_addr,args, volume):
     if volume == 1.0 :
-      print (args[0])
-      print (args[1])
       pyautogui.click (args[0], args[1])
 
 
@@ -312,10 +308,8 @@ class TTCKey ():
 
   
 def b_handler (unused_addr,args,volume):
-  #print (args[0], args[1])
   if volume == 1.0 :
     pyautogui.click (args[0], args[1])
-  #print ("V:"+str(volume))
   
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
