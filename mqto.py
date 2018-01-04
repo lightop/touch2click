@@ -107,6 +107,7 @@ buttonData = [
               ('softbutton11', 928,105),
               ('softbutton12', 1008,105),
 
+
               #EncoderButtons
               ('A1',120,150),
               ('A2',120,190),
@@ -125,14 +126,86 @@ buttonData = [
               ('X1',1010,420),
               ('X2',1010,460),
               
+              #ProgrammerButtons
+              ('grp',1126,600),
+              ('int',1156,600),
+              ('fx',1186,600),
+              ('pos',1126,630),
+              ('col',1156,630),
+              ('bm',1186,630),
+              ('lay1',1126,660),
+              ('lay2',1156,660),
+              ('lay3',1186,660),
+              ('ctrl',1126,690),
+              ('up',1156,690),
+              ('clse',1186,690),
+              ('left',1126,720),
+              ('down',1156,720),
+              ('right',1186,720),
 
+              ('thru',1245,600),
+              ('slash',1275,600),
+              ('star',1305,600),
+              ('minus',1335,600),
+              ('7',1245,630),
+              ('8',1275,630),
+              ('9',1305,630),
+              ('plus',1335,630),
+              ('4',1245,660),
+              ('5',1275,660),
+              ('6',1305,660),
+              ('full',1335,660),
+              ('1',1245,690),
+              ('2',1275,690),
+              ('3',1305,690),
+              ('at',1335,690),
+              ('0',1245,720),
+              ('dot',1275,720),
+              ('enter',1305,720),
 
+              ('rel',1126,500),
+              ('sel',1156,500),
+              ('clr',2286,500),
+              ('shit',1126,530),
+              ('blind',1156,530),
+              ('backspace',1186,530),
 
-              
+              ('undo',1245,500),
+              ('rem',1275,500),
+              ('mve',1305,500),
+              ('cpy',1335,500),
+              ('set',1245,530),
+              ('inc',1275,530),
+              ('upd',1305,530),
+              ('rec',1335,530),
 
-              
+              ('prog',1165,245),
+              ('out',1195,245),
+              ('setup',1225,245),
+              ('patch',1255,245),
+              ('media',1285,245),
+              ('exec',1315,245),
+              ('page',1165,275),
+              ('cuestack',1195,275),
+              ('cue',1225,275),
+              ('playback',1255,275),
+              ('stackstore',1285,275),
+              ('cuestore',1315,275),
 
-]
+              ('locate',1295,410),
+              ('oddeven',1325,410),
+              ('highlight',1295,440),
+              ('single',1325,440),
+              ('fan',1295,470),
+              ('all',1325,470),
+
+              ('nexthead', 1165,425),
+              ('prevhead',1230,425),
+
+              ('timeline', 1260,330),
+              ('macro', 1290,330),
+              ('help', 1320, 330)
+              ]
 
 def gen_osc_addr (type, number):
   osc_addr = "/" + PREFIX + "/" + type +"/"+str(number)
@@ -229,17 +302,13 @@ class TTCKey ():
   def __init__(self,number,key):
     self.number = number
     self.key = key
-    self.type = "b"
+    self.type = "button"
     self.osc_addr = gen_osc_addr(self.type, self.number)
     dispatcher.map (self.osc_addr, self.handler, self.key )
 
   def handler (self, unused_addr,args, volume):
     if volume == 1.0 :
       pyautogui.hotkey(args[0], args[1])
-
-
-
-
 
   
 def b_handler (unused_addr,args,volume):
@@ -248,14 +317,6 @@ def b_handler (unused_addr,args,volume):
     pyautogui.click (args[0], args[1])
   #print ("V:"+str(volume))
   
-def wb_handler (unused_addr,args,volume):
-  if volume == 1.0 :
-    pyautogui.click (120, args[0])
-    #print (args[0])
-
-
-      
-
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--ip",
@@ -279,43 +340,6 @@ if __name__ == "__main__":
   for x in buttonData:
     b = TTCButton (*x)
     buttons.append(b)
-
-
-  for x in range (0,2):
-    y=150+x*40
-    dispatcher.map("/mq/wb/"+str(x+1),wb_handler,y)
-
-
-  i=1
-  for x in range (0,5):
-    for y in range (0,3):
-      dispatcher.map("/mq/b/"+str(i), b_handler,1126+30*y,600+30*x)
-      i = i+1
-  
-  i=16
-  for x in range (0,5):
-    for y in range (0,4):
-      dispatcher.map("/mq/b/"+str(i), b_handler, 1245+30*y, 600+30*x)
-      i=i+1
-  
-  i=35
-  for x in range(0,2):
-    for y in range (0,3):
-      dispatcher.map("/mq/b/"+str(i), b_handler, 1126+30*y, 500+30*x)
-      i=i+1
-
-  i=41
-  for x in range(0,2):
-    for y in range (0,4):
-      dispatcher.map("/mq/b/"+str(i), b_handler, 1245+30*y, 500+30*x)
-      i=i+1
-
-  i=49
-  for x in range(0,2):
-    for y in range (0,6):
-      dispatcher.map("/mq/b/"+str(i), b_handler, 1165+30*y, 245+30*x)
-      i=i+1
-
 
 
 loop = asyncio.get_event_loop()
