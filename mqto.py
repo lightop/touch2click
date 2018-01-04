@@ -6,7 +6,7 @@ from pythonosc import osc_server
 import asyncio
 import netifaces
 
-pyautogui.PAUSE = 0
+pyautogui.PAUSE = 0.01
 pyautogui.FAILSAFE = True
 PRESSED = 0
 POS = 724
@@ -23,19 +23,20 @@ faderData = [
               (8,807,726,807,634),
               (9,904,726,904,634),
               (10,1001,726,1001,634),
+              (11,1072,726,1072,634)
 
               ]
 
 encoderData = [
 
-              (1,40,172),
-              (2,40,262),
-              (3,40,352),
-              (4,40,442),
-              (5,1092,172),
-              (6,1092,262),
-              (7,1092,352),
-              (8,1092,442),
+              ('A',40,172),
+              ('B',40,262),
+              ('C',40,352),
+              ('D',40,442),
+              ('E',1092,172),
+              ('F',1092,262),
+              ('Y',1092,352),
+              ('X',1092,442),
 
               ]
 
@@ -63,27 +64,70 @@ buttonData = [
               ('go9', 904,586),
               ('go10', 1001,586),
 
-              ('pause1', 128,586),
-              ('pause2', 128,586),
-              ('pause3', 128,586),
-              ('pause4', 128,586),
-              ('pause5', 128,586),
-              ('pause6', 128,586),
-              ('pause7', 128,586),
-              ('pause8', 128,586),
-              ('pause9', 128,586),
-              ('pause10', 128,586),
+              ('pause1', 128,609),
+              ('pause2', 225,609),
+              ('pause3', 322,609),
+              ('pause4', 419,609),
+              ('pause5', 516,609),
+              ('pause6', 613,609),
+              ('pause7', 710,609),
+              ('pause8', 807,609),
+              ('pause9', 904,609),
+              ('pause10', 1001,609),
 
-              ('flash1', 128,586),
-              ('flash2', 128,586),
-              ('flash3', 128,586),
-              ('flash4', 128,586),
-              ('flash5', 128,586),
-              ('flash6', 128,586),
-              ('flash7', 128,586),
-              ('flash8', 128,586),
-              ('flash9', 128,586),
-              ('flash10', 128,586),
+              ('flash1', 128,751),
+              ('flash2', 225,751),
+              ('flash3', 322,751),
+              ('flash4', 419,751),
+              ('flash5', 516,751),
+              ('flash6', 613,751),
+              ('flash7', 710,751),
+              ('flash8', 807,751),
+              ('flash9', 904,751),
+              ('flash10', 1001,751),
+
+
+              #XFade
+              ('xgo', 1060,586),
+              ('xpause', 1060, 609),
+              ('xnext', 1083,586),
+              ('xprev', 1083, 609),
+
+              #SoftButtons
+              ('softbutton1', 128,105),
+              ('softbutton2', 208,105),
+              ('softbutton3', 288,105),
+              ('softbutton4', 368,105),
+              ('softbutton5', 448,105),
+              ('softbutton6', 528,105),
+              ('softbutton7', 608,105),
+              ('softbutton8', 688,105),
+              ('softbutton9', 768,105),
+              ('softbutton10', 848,105),
+              ('softbutton11', 928,105),
+              ('softbutton12', 1008,105),
+
+              #EncoderButtons
+              ('A1',120,150),
+              ('A2',120,190),
+              ('B1',120,240),
+              ('B2',120,280),
+              ('C1',120,330),
+              ('C2',120,370),
+              ('D1',120,420),
+              ('D2',120,460),
+              ('E1',1010,150),
+              ('E2',1010,190),
+              ('F1',1010,240),
+              ('F2',1010,280),
+              ('Y1',1010,330),
+              ('Y2',1010,370),
+              ('X1',1010,420),
+              ('X2',1010,460),
+              
+
+
+
               
 
               
@@ -114,7 +158,7 @@ class TTCButton ():
       pyautogui.click (args[0], args[1])
 
 
-class TTCSlider ():
+class TTCFader ():
   
   def __init__(self, number, x_zero, y_zero, x_full, y_full):
     self.number = number
@@ -194,14 +238,9 @@ class TTCKey ():
       pyautogui.hotkey(args[0], args[1])
 
 
-def sb_handler(unused_addr,args,volume):
-  #print (args[0])
-  #print (PRESSED)
-  pyautogui.click(args[0],105)
 
-def go_handler(unused_addr,args,volume):
-  if (volume == 1.0):
-    pyautogui.click(args[0], 586)
+
+
   
 def b_handler (unused_addr,args,volume):
   #print (args[0], args[1])
@@ -228,7 +267,7 @@ if __name__ == "__main__":
   
   faders = []
   for x in faderData:
-    f= TTCSlider (*x)
+    f= TTCFader (*x)
     faders.append (f)
 
   encoders =[]
@@ -241,9 +280,6 @@ if __name__ == "__main__":
     b = TTCButton (*x)
     buttons.append(b)
 
-  for x in range (0,11):
-      y = 128+x*80
-      dispatcher.map("/mq/sb/"+str(x+1), sb_handler,y)
 
   for x in range (0,2):
     y=150+x*40
