@@ -164,7 +164,7 @@ buttonData = [
               ('rel',1126,500),
               ('sel',1156,500),
               ('clr',1186,500),
-              ('shit',1126,530),
+              ('shift',1126,530),
               ('blind',1156,530),
               ('backspace',1186,530),
 
@@ -223,8 +223,10 @@ class TTCButton ():
     dispatcher.map (self.osc_addr, self.handler, x, y )
 
   def handler (self, unused_addr,args, volume):
-    if volume == 1.0 :
-      pyautogui.click (args[0], args[1])
+    if volume == 1.0:  
+      pyautogui.mouseDown (args[0], args[1])
+    if volume == 0.0:
+      pyautogui.mouseUp ()
 
 
 class TTCFader ():
