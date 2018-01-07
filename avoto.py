@@ -4,7 +4,6 @@ import pyautogui
 from pythonosc import dispatcher
 from pythonosc import osc_server
 import asyncio
-import netifaces
 
 pyautogui.PAUSE = 0.01
 pyautogui.FAILSAFE = True
@@ -45,6 +44,7 @@ keyData = [
            ('D', ['alt','4']),
            ('E', ['alt','5']),
            ('F', ['alt','6']),
+           ('G', ['alt', '7']),
 
            ('1',['1']),
            ('2',['2']),
@@ -66,16 +66,26 @@ keyData = [
            
 
 
-           ('fixture',['','','']),
-           ('palette',['','','']),
-           ('macro',['','','']),
-           ('group',['','','']),
-           ('',['','','']),
-           ('',['','','']),
-           ('',['','','']),
-           ('',['','','']),
-           ('',['','','']),
-           ('',['','','']),
+           ('fixture',['alt','shift','f']),
+           ('palette',['alt','shit','p']),
+           ('macro',['alt','shift','m']),
+           ('group',['alt','shift','g']),
+           ('thro',['/','','']),
+           ('at',['*','','']),
+           ('not',['-','','']),
+           ('and',['+','','']),
+           ('undo',['ctrl','z','']),
+           ('record',['alt','r','']),
+           ('locate', ['alt', 'l']),
+           ('patch', ['alt', 'p']),
+           ('disk', ['alt', 'shift','d']),
+           ('system', ['alt', 'shift','l']),
+           ('view', ['alt', 'v']),
+           ('go', ['alt', 'g']),
+           ('delete', ['alt', 'd']),
+           ('shape', ['alt', 's']),
+           
+
 
 
 
@@ -195,7 +205,7 @@ def b_handler (unused_addr,args,volume):
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--ip",
-      default="127.0.0.1", help="The ip to listen on")
+      default="192.168.1.123", help="The ip to listen on")
   parser.add_argument("--port",
       type=int, default=8000, help="The port to listen on")
   args = parser.parse_args()
@@ -221,6 +231,8 @@ if __name__ == "__main__":
   for x,y in keyData:
     k = TTCKey (x, y)
 
+
+pyautogui.hotkey ('numlock')
 
 loop = asyncio.get_event_loop()
 server = osc_server.AsyncIOOSCUDPServer((args.ip, args.port), dispatcher, loop)
