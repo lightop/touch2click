@@ -10,88 +10,6 @@ pyautogui.PAUSE = 0.01
 pyautogui.FAILSAFE = True
 PREFIX = "avo"
 
-faderData = [
-              (1,135,840,135,760),
-              (2,240,840,240,760),
-              (3,345,840,345,760),
-              (4,450,840,450,760),
-              (5,555,840,555,760),
-              (6,660,840,660,760),
-              (7,765,840,765,760),
-              (8,870,840,870,760),
-              (9,975,840,975,760),
-              (10,1080,840,1080,760),
-
-              ]
-
-encoderData = [
-
-              ('A',40,172),
-              ('B',40,262),
-              ('C',40,352),
-
-              ]
-
-buttonData = [
-              
-              
-              ]
-
-keyData = [
-           
-           ('A', ['alt','1']),
-           ('B', ['alt','2']),
-           ('C', ['alt','3']),
-           ('D', ['alt','4']),
-           ('E', ['alt','5']),
-           ('F', ['alt','6']),
-           ('G', ['alt', '7']),
-
-           ('1',['1']),
-           ('2',['2']),
-           ('3',['3']),
-           ('4',['4']),
-           ('5',['5']),
-           ('6',['6']),
-           ('7',['7']),
-           ('8',['8']),
-           ('9',['9']),
-           ('0',['0']),
-
-           ('enter',['enter']),
-           ('exit',['esc']),
-           ('avo',['alt', 'a']),
-           ('clear',['alt','c']),
-           ('',['']),
-           
-           
-
-
-           ('fixture',['alt','shift','f']),
-           ('palette',['alt','shit','p']),
-           ('macro',['alt','shift','m']),
-           ('group',['alt','shift','g']),
-           ('thro',['divide']),
-           ('at',['multiply']),
-           ('not',['subtract']),
-           ('and',['add']),
-           ('undo',['ctrl','z']),
-           ('record',['alt','r']),
-           ('locate', ['alt', 'l']),
-           ('patch', ['alt','p']),
-           ('disk', ['alt', 'shift','d']),
-           ('system', ['alt', 'shift','l']),
-           ('view', ['alt', 'v']),
-           ('go', ['alt', 'g']),
-           ('delete', ['alt', 'd']),
-           ('shape', ['alt', 's']),
-           
-
-
-
-
-
-]
 
 def gen_osc_addr (type, number):
   osc_addr = "/" + PREFIX + "/" + type +"/"+str(number)
@@ -101,7 +19,6 @@ def gen_osc_addr (type, number):
 def store_data (filename):
   print (filename)
   data = (buttonData, faderData, keyData, encoderData)
-  #self.filename = filename
   with open (filename, 'w') as f:
     json.dump(data, f, indent = 2)
 
@@ -230,8 +147,11 @@ if __name__ == "__main__":
 
   with open (args.file, 'r') as f:
     dd = json.load (f)
+    (buttonData, faderData, keyData, encoderData) = dd
 
-  print (dd)
+    print ('ddsvsdv')
+
+  
   
   faders = []
   for x in faderData:
@@ -249,7 +169,6 @@ if __name__ == "__main__":
     buttons.append(b)
 
   keys = []
-  #print (keyData)
   for x,y in keyData:
     k = TTCKey (x, y)
 

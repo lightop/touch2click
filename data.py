@@ -8,7 +8,7 @@ import json
 
 pyautogui.PAUSE = 0.01
 pyautogui.FAILSAFE = True
-PREFIX = "avo"
+prefix = "avo"
 
 faderData = [
               (1,135,840,135,760),
