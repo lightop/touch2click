@@ -208,11 +208,17 @@ buttonData = [
 def gen_osc_addr (type, number):
   osc_addr = "/" + PREFIX + "/" + type +"/"+str(number)
   print (osc_addr)
-  return (osc_addr)
+  return osc_addr
 
 
+def handler (unused_addr, args, volume):
+  if volume == 1.0:
+    pyautogui.mouseDown (args[0], args[1])
+  if volume == 0.0:
+    pyautogui.mouseUp ()
 
-class TTCButton ():
+
+class TTCButton:
 
   def __init__(self,number,x,y):
     self.number = number
@@ -220,16 +226,10 @@ class TTCButton ():
     self.y = y
     self.type = "button"
     self.osc_addr = gen_osc_addr(self.type, self.number)
-    dispatcher.map (self.osc_addr, self.handler, x, y )
-
-  def handler (self, unused_addr,args, volume):
-    if volume == 1.0:  
-      pyautogui.mouseDown (args[0], args[1])
-    if volume == 0.0:
-      pyautogui.mouseUp ()
+    dispatcher.map (self.osc_addr, handler, x, y )
 
 
-class TTCFader ():
+class TTCFader:
   
   def __init__(self, number, x_zero, y_zero, x_full, y_full):
     self.number = number
@@ -253,14 +253,14 @@ class TTCFader ():
     
 
   def handler_z (self, unused_addr,args, volume):
-    if (volume == 1): 
+    if volume == 1:
       pyautogui.mouseDown(self.x_zero - self.x_level,self.y_zero - self.y_level)
       
-    if (volume ==0):
+    if volume ==0:
       pyautogui.mouseUp()
 
 
-class TTCEncoder ():
+class TTCEncoder:
 
   def __init__(self, number,x,y):
     self.number = number
@@ -271,31 +271,32 @@ class TTCEncoder ():
     dispatcher.map (self.osc_addr, self.handler,self.x, self.y)
     dispatcher.map (self.osc_addr+"/z", self.handler_z, self.x, self.y)
 
-  def handler(self,unused_addr,args,volume):
-    if (volume == 1.0):
+  @staticmethod
+  def handler(unused_addr, args, volume):
+    if volume == 1.0:
       try:
         pyautogui.moveRel(0,1)
       except (RuntimeError,ValueError): pass
     
-    if (volume == 0.0):
+    if volume == 0.0:
       try:
         pyautogui.moveRel(0,-1)
       except (RuntimeError,ValueError): pass
 
   def handler_z(self, unused_addr, args, volume):
     
-    if (volume == 1.0):
+    if volume == 1.0:
       try:
         pyautogui.mouseDown (args[0], args[1])
       except (RuntimeError,ValueError): pass
     
-    if (volume == 0.0):
+    if volume == 0.0:
       try:
         pyautogui.mouseUp()
       except (RuntimeError,ValueError): pass
 
 
-class TTCKey ():
+class TTCKey:
 
   def __init__(self,number,key):
     self.number = number
@@ -308,7 +309,7 @@ class TTCKey ():
     if volume == 1.0 :
       pyautogui.hotkey(args[0], args[1])
 
-  
+
 def b_handler (unused_addr,args,volume):
   if volume == 1.0 :
     pyautogui.click (args[0], args[1])

@@ -8,7 +8,7 @@ import json
 
 pyautogui.PAUSE = 0.01
 pyautogui.FAILSAFE = True
-PREFIX = "avo"
+prefix = None
 
 
 def gen_osc_addr (type, number):
@@ -146,10 +146,7 @@ if __name__ == "__main__":
   dispatcher = dispatcher.Dispatcher()
 
   with open (args.file, 'r') as f:
-    dd = json.load (f)
-    (buttonData, faderData, keyData, encoderData) = dd
-
-    print ('ddsvsdv')
+    (buttonData, faderData, keyData, encoderData) = json.load (f)
 
   
   

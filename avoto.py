@@ -11,30 +11,80 @@ pyautogui.FAILSAFE = True
 PREFIX = "avo"
 
 faderData = [
-              (1,135,840,135,760),
-              (2,240,840,240,760),
-              (3,345,840,345,760),
-              (4,450,840,450,760),
-              (5,555,840,555,760),
-              (6,660,840,660,760),
-              (7,765,840,765,760),
-              (8,870,840,870,760),
-              (9,975,840,975,760),
-              (10,1080,840,1080,760),
+              (1,127,702,127,620),
+              (2,206,702,206,620),
+              (3,285,702,285,620),
+              (4,364,702,364,620),
+              (5,443,702,443,620),
+              (6,522,702,522,620),
+              (7,601,702,601,620),
+              (8,680,702,680,620),
+              (9,759,702,759,620),
+              (10,838,702,838,620),
 
               ]
 
 encoderData = [
 
-              ('A',40,172),
-              ('B',40,262),
-              ('C',40,352),
+              (1,1070,580,10,0),
+              (2,1190,580,10,0),
+              (3,1310,580,10,0),
 
               ]
 
 buttonData = [
-              
-              
+              ('ws1',50,68),
+              ('ws2',50,101),
+              ('ws3',50,134),
+              ('ws4',50,167),
+              ('ws5',50,200),
+              ('ws6',50,233),
+              ('ws7',50,266),
+              ('ws8',50,299),
+              ('ws9',50,332),
+              ('ws10',50,365),
+
+              ('pageplus', 45, 506),
+              ('pageminus',45, 678),
+
+              ('flash1',127,586),
+              ('flash2',206,586),
+              ('flash3',285,586),
+              ('flash4',364,586),
+              ('flash5',443,586),
+              ('flash6',522,586),
+              ('flash7',601,586),
+              ('flash8',680,586),
+              ('flash9',759,586),
+              ('flash10',838,586),
+
+              ('swop1',127,545),
+              ('swop2',206,545),
+              ('swop3',285,545),
+              ('swop4',364,545),
+              ('swop5',443,545),
+              ('swop6',522,545),
+              ('swop7',601,545),
+              ('swop8',680,545),
+              ('swop9',759,545),
+              ('swop10',838,545),
+
+              ('intensity',1029,538),
+              ('position',1071,538),
+              ('color',1113,538),
+              ('gobo',1155,538),
+              ('beam',1197,538),
+              ('effect',1239,538),
+              ('special',1281,538),
+              ('fx',1323,538),
+
+              ('encoder1up',1074,646),
+              ('encoder2up',1188,646),
+              ('encoder3up',1304,646),
+              ('encoder1down',1074,698),
+              ('encoder2down',1188,698),
+              ('encoder3down',1304,698),
+
               ]
 
 keyData = [
@@ -62,10 +112,27 @@ keyData = [
            ('exit',['esc']),
            ('avo',['alt', 'a']),
            ('clear',['alt','c']),
-           ('',['']),
-           
-           
 
+           ('f1', ['f1']),
+           ('f2', ['f2']),
+           
+           ('f3', ['f3']),
+           ('f3s', ['shift','f3']),
+           
+           ('f4', ['f4']),
+           ('f4s', ['shift','f4']),
+           
+           ('f5', ['f5']),
+           ('f5s', ['shift','f5']),
+           
+           ('f6', ['f6']),
+           ('f7', ['f7']),
+           ('f8', ['f8']),
+           ('f9', ['f9']),
+           ('f10', ['f10']),
+           ('f11', ['f11']),
+           ('f12', ['f12']),
+           
 
            ('fixture',['alt','shift','f']),
            ('palette',['alt','shit','p']),
@@ -80,14 +147,26 @@ keyData = [
            ('locate', ['alt', 'l']),
            ('patch', ['alt','p']),
            ('disk', ['alt', 'shift','d']),
-           ('system', ['alt', 'shift','l']),
-           ('view', ['alt', 'v']),
+           ('system', ['alt', 'shift','s']),
+           ('view', ['alt','v']),
            ('go', ['alt', 'g']),
            ('delete', ['alt', 'd']),
+           ('copy', ['alt','shift','c']),
+           ('move', ['alt', 'm']),
+           ('unfold', ['alt','u']),
+           ('include', ['alt', 'i']),
+           ('release', ['alt','shift','r']),
            ('shape', ['alt', 's']),
-           
-
-
+           ('mlmenu', ['alt', 't']),
+           ('blind', ['alt','b']),
+           ('off', ['alt','o']),
+           ('fan', ['alt', 'f']),
+           ('options', ['alt','shift','o']),
+           ('latch', ['alt','shift','l']),
+           ('fixprev', ['alt', 'left']),
+           ('fixnext', ['alt', 'right']),
+           ('all', ['alt','up']),
+           ('highlight', ['alt', 'down']),
 
 
 
@@ -158,10 +237,12 @@ class TTCFader ():
 
 class TTCEncoder ():
 
-  def __init__(self, number,x,y):
+  def __init__(self, number,x,y,h,v):
     self.number = number
     self.x = x
     self.y = y
+    self.h = h
+    self.v = v
     self.type = "encoder"
     self.osc_addr = gen_osc_addr(self.type, self.number)
     dispatcher.map (self.osc_addr, self.handler,self.x, self.y)
@@ -170,12 +251,12 @@ class TTCEncoder ():
   def handler(self,unused_addr,args,volume):
     if (volume == 1.0):
       try:
-        pyautogui.moveRel(0,1)
+        pyautogui.moveRel(self.h, self.v)
       except (RuntimeError,ValueError): pass
     
     if (volume == 0.0):
       try:
-        pyautogui.moveRel(0,-1)
+        pyautogui.moveRel(self.h*-1,self.v*-1)
       except (RuntimeError,ValueError): pass
 
   def handler_z(self, unused_addr, args, volume):
@@ -188,7 +269,7 @@ class TTCEncoder ():
     if (volume == 0.0):
       try:
         pyautogui.mouseUp()
-      except (RuntimeError,ValueError): pass
+      except (RuntfimeError,ValueError): pass
 
 
 class TTCKey ():
@@ -214,9 +295,9 @@ class TTCKey ():
   
 
   
-def b_handler (unused_addr,args,volume):
-  if volume == 1.0 :
-    pyautogui.click (args[0], args[1])
+# def b_handler (unused_addr,args,volume):
+#   if volume == 1.0 :
+#     pyautogui.click (args[0], args[1])
   
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
@@ -228,10 +309,7 @@ if __name__ == "__main__":
   args = parser.parse_args()
   dispatcher = dispatcher.Dispatcher()
 
-  with open (args.file, 'r') as f:
-    dd = json.load (f)
-
-  print (dd)
+  
   
   faders = []
   for x in faderData:

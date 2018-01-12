@@ -1,8 +1,9 @@
 import argparse
 import json
+import yaml
 
 prefix = "mq"
-filename = "magicq-linux-1336x768.t2c"
+filename = "magicq-linux-1336x768.yaml"
 
 faderData = [
               (1,128,726,128,634),
@@ -211,7 +212,7 @@ data = {
 
 
 with open (filename, 'w') as f:
-  json.dump(data, f, indent = 2)
+  yaml.dump(data, f)
 
   
   
