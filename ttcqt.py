@@ -13,7 +13,7 @@ from pythonosc import osc_server
 import asyncio
 import netifaces
 
-pyautogui.PAUSE = 0.01
+pyautogui.PAUSE = 0.01 #Vasya! Don't you ever forget about this!
 
 buttonData = []
 faderData =[]
@@ -25,7 +25,8 @@ faders = []
 encoders = []
 keys = []
 
-prefix ='avo'
+global prefix
+
 
 
 
@@ -37,10 +38,10 @@ ip = netifaces.ifaddresses(dgw)[netifaces.AF_INET][0]['addr']
 port = 8000
 
 
-def gen_osc_addr (type, number):
-		osc_addr = "/" + prefix + "/" + type +"/"+str(number)
-		print (osc_addr)
-		return (osc_addr)
+# def gen_osc_addr (type, number):
+# 		osc_addr = "/" + prefix + "/" + type +"/"+str(number)
+# 		print (osc_addr)
+# 		return (osc_addr)
 
 
 
@@ -86,12 +87,13 @@ class MainWindow(QMainWindow):
 		traymenu.addAction(self.hideAct)
 		traymenu.addAction(self.quitAct)
 		self.tray.setContextMenu(traymenu)
+		self.tray.setIcon(QIcon("ttc.ico"))
 		self.tray.show()
 
 		self.server = ServerThread()
 		
 	def gen_osc_addr (type, number):
-		osc_addr = "/" + PREFIX + "/" + type +"/"+str(number)
+		osc_addr = "/" + prefix + "/" + type +"/"+str(number)
 		print (osc_addr)
 		return (osc_addr)
 
@@ -109,19 +111,19 @@ class MainWindow(QMainWindow):
 			
 
 			for x in faderData:
-				f= TTCFader (*x)
+				f= TTCFader (prefix,*x)
 				faders.append (f)
 
 			for x in encoderData:
-				e = TTCEncoder (*x)
+				e = TTCEncoder (prefix,*x)
 				encoders.append (e)
 
 			for x in buttonData:
-				b = TTCButton (*x)
+				b = TTCButton (prefix, *x)
 				buttons.append(b)
 
 			for x,y in keyData:
-				k = TTCKey (x, y)
+				k = TTCKey (prefix,x, y)
 				keys.append(k)
 
 			print (prefix)
@@ -277,12 +279,12 @@ class KeyTab (QWidget):
 
 class TTCButton ():
 
-  def __init__(self,number,x,y):
+  def __init__(self,prefix,number,x,y):
     self.number = number
     self.x = x
     self.y = y
     self.type = "button"
-    self.osc_addr = gen_osc_addr(self.type, self.number)
+    self.osc_addr =   "/" + prefix + "/" + self.type +"/"+str(self.number)
     dispatcher.map (self.osc_addr, self.handler, x, y )
 
   def handler (self, unused_addr,args, volume):
@@ -294,18 +296,19 @@ class TTCButton ():
 
 class TTCFader ():
   
-  def __init__(self, number, x_zero, y_zero, x_full, y_full):
+  def __init__(self, prefix,number, x_zero, y_zero, x_full, y_full):
     self.number = number
     self.x_zero = x_zero
     self.y_zero = y_zero
     self.x_full = x_full
     self.y_full = y_full
+    self.prefix = prefix
     self.y_size = self.y_zero - self.y_full
     self.x_size = self.x_zero - self.x_full
     self.type = "fader"
     self.x_level = 0
     self.y_level = 0
-    self.osc_addr = gen_osc_addr (self.type, self.number)
+    self.osc_addr =  "/" + self.prefix + "/" + self.type +"/"+str(self.number)
     print (self.osc_addr)
     dispatcher.map (self.osc_addr, self.handler, self.x_zero, self.y_zero)
     dispatcher.map (self.osc_addr+"/z",self.handler_z, self.x_zero, self.y_zero)
@@ -326,14 +329,14 @@ class TTCFader ():
 
 class TTCEncoder ():
 
-  def __init__(self, number,x,y,h,v):
+  def __init__(self, prefix,number,x,y,h,v):
     self.number = number
     self.x = x
     self.y = y
     self.h = h
     self.v = v
     self.type = "encoder"
-    self.osc_addr = gen_osc_addr(self.type, self.number)
+    self.osc_addr =  "/" + prefix + "/" + self.type +"/"+str(self.number)
     dispatcher.map (self.osc_addr, self.handler,self.x, self.y)
     dispatcher.map (self.osc_addr+"/z", self.handler_z, self.x, self.y)
 
@@ -364,11 +367,11 @@ class TTCEncoder ():
 
 class TTCKey ():
 
-  def __init__(self,number,key):
+  def __init__(self,prefix,number,key):
     self.number = number
     self.key = key
     self.type = "button"
-    self.osc_addr = gen_osc_addr(self.type, self.number)
+    self.osc_addr =  "/" + prefix + "/" + self.type +"/"+str(self.number)
     dispatcher.map (self.osc_addr, self.handler, self.key )
 
   def handler (self, unused_addr,args, volume):
