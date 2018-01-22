@@ -20,15 +20,26 @@ faderData =[]
 encoderData = []
 keyData = []
 
+
+
 buttons = []
 faders = []
 encoders = []
 keys = []
 
-global prefix
+prefix = 'none'
 
 
+data = {
+  
+  "prefix":prefix,
+  "faderData":faderData,
+  "encoderData":encoderData,
+  "buttonData":buttonData,
+  "keyData":keyData
+}
 
+print (data)
 
 
 
@@ -36,13 +47,6 @@ global prefix
 dgw = netifaces.gateways()['default'][netifaces.AF_INET][1]
 ip = netifaces.ifaddresses(dgw)[netifaces.AF_INET][0]['addr']
 port = 8000
-
-
-# def gen_osc_addr (type, number):
-# 		osc_addr = "/" + prefix + "/" + type +"/"+str(number)
-# 		print (osc_addr)
-# 		return (osc_addr)
-
 
 
 class MainWindow(QMainWindow):
@@ -53,6 +57,7 @@ class MainWindow(QMainWindow):
 		self.resize(550,400)
 
 		self.times = 0
+		self.data = data
 
 		self.buttonTable = ButtonTab()
 		self.faderTable = FaderTab()
@@ -69,7 +74,7 @@ class MainWindow(QMainWindow):
 		
 		self.setCentralWidget(self.tabwidget)
 
-		self.statusBar().showMessage("Touch to click!!!")
+		self.statusBar().showMessage("Address: {}".format((ip, port)))
 		self.createActions()
 		self.createMenus()
 
@@ -77,8 +82,8 @@ class MainWindow(QMainWindow):
 		
 		testAct = QAction('Start',self)
 		self.toolBar.addAction(self.startAct)
-		test2Act = QAction('Start2',self)
-		self.toolBar.addAction(self.start2Act)
+		test2Act = QAction('Hide',self)
+		self.toolBar.addAction(self.hideAct)
 
 		self.tray = QSystemTrayIcon(self)
 		self.tray.setIcon(self.style().standardIcon(QStyle.SP_ComputerIcon))
@@ -91,6 +96,8 @@ class MainWindow(QMainWindow):
 		self.tray.show()
 
 		self.server = ServerThread()
+
+	
 		
 	def gen_osc_addr (type, number):
 		osc_addr = "/" + prefix + "/" + type +"/"+str(number)
@@ -99,15 +106,16 @@ class MainWindow(QMainWindow):
 
 
 	def open(self):
-		filename, _ = QFileDialog.getOpenFileName(self)
+		filename, _ = QFileDialog.getOpenFileName(self, "Open file", '~/git/touch2click',"T2C Files (*.t2c);;YAML Files (*.yaml)")
 		print (filename)
+		print (self.data)
 		with open (filename, 'r') as f:
-			data = yaml.load (f)
-			prefix = data['prefix']
-			buttonData= data ['buttonData']
-			faderData = data ['faderData']
-			encoderData = data ['encoderData']
-			keyData = data ['keyData']
+			self.data = yaml.load (f)
+			prefix = self.data['prefix']
+			buttonData= self.data ['buttonData']
+			faderData = self.data ['faderData']
+			encoderData = self.data ['encoderData']
+			keyData = self.data ['keyData']
 			
 
 			for x in faderData:
@@ -134,9 +142,12 @@ class MainWindow(QMainWindow):
 			
 
 	def save(self):
-		print ("Saved  "+str(self.times))
-		self.times +=1
-		print (buttonData)
+		filename, _ = QFileDialog.getSaveFileName(
+			self, "Save File","","T2C Files (*.t2c);;YAML Files (*.yaml);;All Files (*)")
+		if filename :
+			with open (filename, 'w') as f:
+				yaml.safe_dump(self.data, f)
+		print (self.data)
 
 	def fill(self):
 		self.buttonTable.fillItems()
@@ -195,9 +206,13 @@ class ButtonTab(QWidget):
 		self.table.setHorizontalHeaderLabels(
 			['Index', 'X-Click', 'Y-Click',])
 		self.table.resizeColumnsToContents()
+		self.table.cellChanged.connect(self.test)
 
 		layout.addWidget(self.table,0,0)
 
+	def test (self,row,column):
+		pass
+		
 
 	def fillItems(self, buttonData):
 		length = len(buttonData)
