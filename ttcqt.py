@@ -390,8 +390,12 @@ class TTCKey ():
     dispatcher.map (self.osc_addr, self.handler, self.key )
 
   def handler (self, unused_addr,args, volume):
-    if volume == 1.0 :
-       pyautogui.hotkey (*args[0], interval = 0.1)
+
+  	if volume == 1.0 :
+  		pyautogui.hotkey (*args[0], interval = 0.1)
+
+  	elif volume == 0.0:
+  		return
        #    for i in args[0]:
     #     pyautogui.keyDown (i)
     #     print (i)
@@ -399,6 +403,13 @@ class TTCKey ():
     #   for i in args[0]:
     #     pyautogui.keyUp (i)
     #     print (i)
+# 	pyautogui.keyDown(press[0])
+  	# 	print (press[0])
+  	# 	pyautogui.press(press[1])
+  	# 	print (press[1])
+  	# 	if volume == 0.0 :
+  	# 		pyautogui.keyUp(press[0])
+  	# 		print (args[0])
 
 
 class ServerThread (QThread):
