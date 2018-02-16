@@ -82,17 +82,26 @@ class MainWindow(QMainWindow):
 		self.times = 0
 		self.data = data
 
-		self.buttonTable = ButtonTab()
-		self.faderTable = FaderTab()
-		self.encoderTable = EncoderTab()
-		self.keyTable = KeyTab()
+		self.buttonTable = TTCTab(['Index', 'X-Click', 'Y-Click',])
+		self.faderTable = TTCTab(['Index', 'X-Zero','Y-Zero','X-Full', 'Y-Full'])
+		self.encoderTable = TTCTab(['Index', 'X-Center','Y-Center','X-Step', 'Y-Step'])
+		self.keyTable = TTCTab(['Index', 'Keys'])
+
+		self.testTable = TTCTab(['1','2','3'])
+
+		self.setup = SetupTab()
 
 		self.tabwidget = QTabWidget()
+
+		self.tabwidget.addTab(self.setup, "Setup")
+
 		self.tabwidget.addTab(self.buttonTable,"Buttons")
 		self.tabwidget.addTab(self.faderTable,"Faders")
 		self.tabwidget.addTab(self.encoderTable,"Encoders")
 		self.tabwidget.addTab(self.keyTable,"Keys")
 		self.tabwidget.addTab(QLabel("Not yet implemented..."),"Grids")
+
+		
 		
 		
 		self.setCentralWidget(self.tabwidget)
@@ -129,7 +138,10 @@ class MainWindow(QMainWindow):
 
 
 	def open(self):
-		filename, _ = QFileDialog.getOpenFileName(self, "Open file", '~/git/touch2click',"T2C Files (*.t2c);;YAML Files (*.yaml)")
+		filename, _ = QFileDialog.getOpenFileName(
+			self, "Open file", 
+			'~/git/touch2click',
+			"T2C Files (*.t2c);;YAML Files (*.yaml)")
 		print (filename)
 		print (self.data)
 		with open (filename, 'r') as f:
@@ -218,109 +230,60 @@ class MainWindow(QMainWindow):
 
 		self.runMenu =self.menuBar().addMenu("&Run")
 
-class ButtonTab(QWidget):
-	def __init__(self):
+class TTCTab(QWidget):
+	def __init__(self,*args):
 		super(QWidget,self).__init__()
 		layout = QGridLayout()
-		self.setLayout(layout)
-		self.table = QTableWidget()
-		self.table.setRowCount (0)
-		self.table.setColumnCount (3)
-		self.table.setHorizontalHeaderLabels(
-			['Index', 'X-Click', 'Y-Click',])
-		self.table.resizeColumnsToContents()
-		self.table.cellChanged.connect(self.test)
 
-		layout.addWidget(self.table,0,0)
-
-	def test (self,row,column):
-		pass
+		self.columns = len(*args)
 		
-
-	def fillItems(self, buttonData):
-		length = len(buttonData)
+		self.setLayout(layout)
+		self.table =QTableWidget()
+		self.table.setRowCount(1)
+		self.table.setColumnCount(len(*args))
+		self.table.setHorizontalHeaderLabels(*args)
+		self.table.resizeColumnsToContents()
+		layout.addWidget(self.table,0,0)
+		self.insButton = QPushButton ("Insert")
+		layout.addWidget(self.insButton,1,0)
+		self.delButton = QPushButton("Delete")
+		layout.addWidget(self.delButton,1,1)
+		
+	def fillItems(self, data):
+		length = len(data)
 		self.table.setRowCount(length)
 		for row in range (length):
-			for column in range(3):
-				item = str(buttonData[row][column])
+			for column in range(self.columns):
+				item = str(data[row][column])
 				self.table.setItem(row, column, QTableWidgetItem(item))
 				self.table.item(row, column).setTextAlignment(Qt.AlignCenter)
 		self.table.resizeColumnsToContents()
 
-class FaderTab (QWidget):
+class TTCClass(TTCTab):
+	def __init__(self,*args):
+		TTCTab.__init__(self, *args)
+
+class SetupTab(QWidget):
 	def __init__(self):
 		super(QWidget,self).__init__()
-		layout = QGridLayout()
-		self.setLayout(layout)
-		self.table =QTableWidget()
-		self.table.setRowCount(0)
-		self.table.setColumnCount(5)
-		self.table.setHorizontalHeaderLabels(
-			['Index', 'X-Zero','Y-Zero','X-Full', 'Y-Full'])
-		self.table.resizeColumnsToContents()
-		layout.addWidget(self.table,0,0)
-	
-	def fillItems(self, faderData):
-		length = len(faderData)
-		self.table.setRowCount(length)
-		for row in range (length):
-			for column in range(5):
-				item = str(faderData[row][column])
-				print (item)
-				self.table.setItem(row, column, QTableWidgetItem(item))
-				self.table.item(row, column).setTextAlignment(Qt.AlignCenter)
-		self.table.resizeColumnsToContents()
+		layout = QFormLayout()
+		
+		addressLabel = QLabel("Address")
+		addressLine = QLineEdit()
+		addressLine.setText(str(ip))
+		layout.addRow (addressLabel,addressLine)
 
-class EncoderTab (QWidget):
-	def __init__(self):
-		super(QWidget,self).__init__()
-		layout = QGridLayout()
-		self.setLayout(layout)
-		self.table =QTableWidget()
-		self.table.setRowCount(0)
-		self.table.setColumnCount(5)
-		self.table.setHorizontalHeaderLabels(
-			['Index', 'X-Center','Y-Center','X-Step', 'Y-Step'])
-		self.table.resizeColumnsToContents()
-		layout.addWidget(self.table,0,0)
-	
-	def fillItems(self, encoderData):
-		length = len(encoderData)
-		self.table.setRowCount(length)
-		for row in range (length):
-			for column in range(5):
-				item = str(encoderData[row][column])
-				print (item)
-				self.table.setItem(row, column, 
-					QTableWidgetItem(item))
-				self.table.item(row, column).setTextAlignment(Qt.AlignCenter)
-		self.table.resizeColumnsToContents()
+		portLabel = QLabel("Port")
+		portLine = QLineEdit()
+		portLine.setText(str(port))
+		layout.addRow (portLabel,portLine)
 
-class KeyTab (QWidget):
-	def __init__(self):
-		super(QWidget,self).__init__()
-		layout = QGridLayout()
-		self.setLayout(layout)
-		self.table =QTableWidget()
-		self.table.setRowCount(0)
-		self.table.setColumnCount(2)
-		self.table.setHorizontalHeaderLabels(
-			['Index', 'Keys'])
-		layout.addWidget(self.table,0,0)
-		self.table.resizeColumnsToContents()
-	
-	def fillItems(self, keyData):
-		length = len(keyData)
-		self.table.setRowCount(length)
-		for row in range (length):
-			for column in range(2):
-				item = str(keyData[row][column])
-				print (item)
+		prefixLabel = QLabel("Prefix")
+		prefixLine = QLineEdit()
+		layout.addRow (prefixLabel, prefixLine)
 
-				self.table.setItem(row, column, 
-					QTableWidgetItem(item))
-				self.table.item(row, column).setTextAlignment(Qt.AlignCenter)
-		self.table.resizeColumnsToContents()
+		self.setLayout(layout)
+
 
 
 
@@ -370,7 +333,7 @@ class TTCFader ():
     if (volume == 1): 
       pyautogui.mouseDown(self.x_zero - self.x_level,self.y_zero - self.y_level)
       
-    if (volume ==0):
+    if (volume == 0):
       pyautogui.mouseUp()
 
 
@@ -428,22 +391,7 @@ class TTCKey ():
 
   	elif volume == 0.0:
   		return
-       #    for i in args[0]:
-    #     pyautogui.keyDown (i)
-    #     print (i)
-    # if volume == 0.0:
-    #   for i in args[0]:
-    #     pyautogui.keyUp (i)
-    #     print (i)
-# 	pyautogui.keyDown(press[0])
-  	# 	print (press[0])
-  	# 	pyautogui.press(press[1])
-  	# 	print (press[1])
-  	# 	if volume == 0.0 :
-  	# 		pyautogui.keyUp(press[0])
-  	# 		print (args[0])
-
-
+ 
 class ServerThread (QThread):
 	def __init__(self):
 		QThread.__init__(self)
@@ -455,19 +403,11 @@ class ServerThread (QThread):
 		server.serve()
 		loop.run_forever()
 
-
-
-  
-
-  
-
-
-
-
 if __name__ == '__main__':
 
 	import sys
 
+	
 
 	dispatcher = dispatcher.Dispatcher()
 	loop = asyncio.get_event_loop()
@@ -475,5 +415,6 @@ if __name__ == '__main__':
 		(ip, port), dispatcher, loop)
 	app = QApplication(sys.argv)
 	mainWin = MainWindow()
+
 	mainWin.show()
 	sys.exit(app.exec_())
