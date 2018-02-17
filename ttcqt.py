@@ -244,10 +244,20 @@ class TTCTab(QWidget):
 		self.table.setHorizontalHeaderLabels(*args)
 		self.table.resizeColumnsToContents()
 		layout.addWidget(self.table,0,0)
+
+		buttonWidget = QWidget()
+		buttonLayout = QGridLayout()
+
 		self.insButton = QPushButton ("Insert")
-		layout.addWidget(self.insButton,1,0)
+		buttonLayout.addWidget(self.insButton,0,0)
 		self.delButton = QPushButton("Delete")
-		layout.addWidget(self.delButton,1,1)
+		buttonLayout.addWidget(self.delButton,0,1)
+		self.someButton = QPushButton ("Any Key")
+		buttonLayout.addWidget(self.someButton,0,2)
+		
+		buttonWidget.setLayout(buttonLayout)
+		layout.addWidget(buttonWidget,1,0)
+
 		
 	def fillItems(self, data):
 		length = len(data)
