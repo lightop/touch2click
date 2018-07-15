@@ -89,7 +89,7 @@ buttonData = [
 
 keyData = [
            
-           ('A', ['alt','1']),
+           ('A', ['ctrl','alt','right']),
            ('B', ['alt','2']),
            ('C', ['alt','3']),
            ('D', ['alt','4']),
@@ -302,7 +302,7 @@ class TTCKey ():
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument("--ip",
-      default="192.168.1.123", help="The ip to listen on")
+      default="192.168.1.121", help="The ip to listen on")
   parser.add_argument("--port",
       type=int, default=8000, help="The port to listen on")
   parser.add_argument ("--file", help="Filename")

@@ -252,8 +252,8 @@ class TTCTab(QWidget):
 		buttonLayout.addWidget(self.insButton,0,0)
 		self.delButton = QPushButton("Delete")
 		buttonLayout.addWidget(self.delButton,0,1)
-		self.someButton = QPushButton ("Any Key")
-		buttonLayout.addWidget(self.someButton,0,2)
+		self.editButton = QPushButton ("Edit")
+		buttonLayout.addWidget(self.editButton,0,2)
 		
 		buttonWidget.setLayout(buttonLayout)
 		layout.addWidget(buttonWidget,1,0)
@@ -267,6 +267,7 @@ class TTCTab(QWidget):
 				item = str(data[row][column])
 				self.table.setItem(row, column, QTableWidgetItem(item))
 				self.table.item(row, column).setTextAlignment(Qt.AlignCenter)
+				self.table.item(row, column).setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled )
 		self.table.resizeColumnsToContents()
 
 class TTCClass(TTCTab):
