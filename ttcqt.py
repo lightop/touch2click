@@ -34,7 +34,8 @@ import pyautogui
 from pythonosc import dispatcher
 from pythonosc import osc_server
 import asyncio
-import netifaces
+#import netifaces
+import psutil
 
 pyautogui.PAUSE = 0.01 #Vasya! Don't you ever forget about this!
 
@@ -62,13 +63,14 @@ data = {
   "keyData":keyData
 }
 
-print (data)
+#print (data)
 
 
 
 
-dgw = netifaces.gateways()['default'][netifaces.AF_INET][1]
-ip = netifaces.ifaddresses(dgw)[netifaces.AF_INET][0]['addr']
+#dgw = netifaces.gateways()['default'][netifaces.AF_INET][1]
+#ip = netifaces.ifaddresses(dgw)[netifaces.AF_INET][0]['addr']
+ip = "127.0.0.1"
 port = 8000
 
 
@@ -151,7 +153,7 @@ class MainWindow(QMainWindow):
 			faderData = self.data ['faderData']
 			encoderData = self.data ['encoderData']
 			keyData = self.data ['keyData']
-			
+
 
 			for x in faderData:
 				f= TTCFader (prefix,*x)
@@ -279,9 +281,25 @@ class SetupTab(QWidget):
 		layout = QFormLayout()
 		
 		addressLabel = QLabel("Address")
-		addressLine = QLineEdit()
-		addressLine.setText(str(ip))
-		layout.addRow (addressLabel,addressLine)
+		# addressLine = QLineEdit()
+		# addressLine.setText(str(ip))
+		# layout.addRow (addressLabel,addressLine)
+		addressList = QComboBox()
+		
+		addresses = psutil.net_if_addrs()
+		print (addresses)
+		stats = psutil.net_if_stats()
+		print (stats)
+
+		available_networks = []
+		for intface, addr_list in addresses.items():
+			if any(getattr(addr, 'address').startswith("169.254") for addr in addr_list):
+				continue
+			elif intface in stats and getattr(stats[intface], "isup"):
+				for addr in addr_list:
+					addressList.addItem(getattr(addr, 'address'))
+		addressList.activated[str].connect(self.onChanged)
+		layout.addRow (addressLabel,addressList)
 
 		portLabel = QLabel("Port")
 		portLine = QLineEdit()
@@ -293,6 +311,12 @@ class SetupTab(QWidget):
 		layout.addRow (prefixLabel, prefixLine)
 
 		self.setLayout(layout)
+
+	def onChanged(self, text):
+		global ip
+		print (ip)
+		ip = text
+		print (ip)
 
 
 
@@ -424,6 +448,7 @@ if __name__ == '__main__':
 	server = osc_server.AsyncIOOSCUDPServer(
 		(ip, port), dispatcher, loop)
 	app = QApplication(sys.argv)
+	app.setStyle("plastique")
 	mainWin = MainWindow()
 
 	mainWin.show()
