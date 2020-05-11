@@ -91,7 +91,7 @@ class MainWindow(QMainWindow):
 
 		self.testTable = TTCTab(['1','2','3'])
 
-		self.setup = SetupTab()
+		self.setup = SetupTab(self)
 
 		self.tabwidget = QTabWidget()
 
@@ -107,8 +107,8 @@ class MainWindow(QMainWindow):
 		
 		
 		self.setCentralWidget(self.tabwidget)
-
-		self.statusBar().showMessage("Address: {}".format((ip, port)))
+		self.statusBar = self.statusBar()
+		self.statusBar.showMessage("Address: {}".format((ip, port)))
 		self.createActions()
 		self.createMenus()
 
@@ -276,10 +276,11 @@ class TTCClass(TTCTab):
 		TTCTab.__init__(self, *args)
 
 class SetupTab(QWidget):
-	def __init__(self):
-		super(QWidget,self).__init__()
+	def __init__(self, parent):
+		super(QWidget,self).__init__(parent)
 		layout = QFormLayout()
-		
+		print (parent)
+		self.parent = parent
 		addressLabel = QLabel("Address")
 		# addressLine = QLineEdit()
 		# addressLine.setText(str(ip))
@@ -317,6 +318,7 @@ class SetupTab(QWidget):
 		print (ip)
 		ip = text
 		print (ip)
+		self.parent.statusBar.showMessage("Address: {}".format((ip, port)))
 
 
 
