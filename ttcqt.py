@@ -36,6 +36,7 @@ from pythonosc import osc_server
 import asyncio
 #import netifaces
 import psutil
+import sys
 
 pyautogui.PAUSE = 0.01 #Vasya! Don't you ever forget about this!
 
@@ -70,8 +71,8 @@ data = {
 
 #dgw = netifaces.gateways()['default'][netifaces.AF_INET][1]
 #ip = netifaces.ifaddresses(dgw)[netifaces.AF_INET][0]['addr']
-ip = "127.0.0.1"
-port = 8000
+# ip = "127.0.0.1"
+# port = 8000
 
 
 class MainWindow(QMainWindow):
@@ -83,6 +84,12 @@ class MainWindow(QMainWindow):
 
 		self.times = 0
 		self.data = data
+		self.ip = "127.0.0.1"
+		self.port = 8000
+
+		self.dispatcher = dispatcher.Dispatcher()
+		# self.loop = asyncio.get_event_loop()
+		# self.server = osc_server.AsyncIOOSCUDPServer((ip, port), dispatcher, self.loop)
 
 		self.buttonTable = TTCTab(['Index', 'X-Click', 'Y-Click',])
 		self.faderTable = TTCTab(['Index', 'X-Zero','Y-Zero','X-Full', 'Y-Full'])
@@ -108,7 +115,7 @@ class MainWindow(QMainWindow):
 		
 		self.setCentralWidget(self.tabwidget)
 		self.statusBar = self.statusBar()
-		self.statusBar.showMessage("Address: {}".format((ip, port)))
+		self.statusBar.showMessage("Address: {}".format((self.ip, self.port)))
 		self.createActions()
 		self.createMenus()
 
@@ -118,6 +125,9 @@ class MainWindow(QMainWindow):
 		self.toolBar.addAction(self.startAct)
 		test2Act = QAction('Hide',self)
 		self.toolBar.addAction(self.hideAct)
+
+		test3Act = QAction('Stop',self)
+		self.toolBar.addAction(self.stopAct)
 
 		self.tray = QSystemTrayIcon(self)
 		self.tray.setIcon(self.style().standardIcon(QStyle.SP_ComputerIcon))
@@ -129,7 +139,7 @@ class MainWindow(QMainWindow):
 		self.tray.setIcon(QIcon("ttc.ico"))
 		self.tray.show()
 
-		self.server = ServerThread()
+		#self.servThread = ServerThread()
 
 	
 		
@@ -196,10 +206,15 @@ class MainWindow(QMainWindow):
 		self.show()
 
 	def startServer (self):
-		self.server.start()
+		self.loop = asyncio.new_event_loop()
+		self.server = osc_server.AsyncIOOSCUDPServer((self.ip, self.port), dispatcher, self.loop)
+		self.server.serve()
 		
 	def start2Server (self):
 		self.server2.start()
+
+	def stopServer(self):
+		self.loop.close()
 
 	def closeEvent(self,event):
 		print ("Goodbye!!")
@@ -219,6 +234,7 @@ class MainWindow(QMainWindow):
 		self.hideAct = QAction('Hide', self, triggered = self.hide)
 		self.quitAct = QAction('Quit', self, triggered=qApp.quit)
 		self.startAct = QAction ('Start', self, triggered = self.startServer)
+		self.stopAct = QAction ('Stop', self, triggered =self.stopServer)
 		self.start2Act = QAction ('Start', self, triggered = self.start2Server)
 
 
@@ -304,7 +320,7 @@ class SetupTab(QWidget):
 
 		portLabel = QLabel("Port")
 		portLine = QLineEdit()
-		portLine.setText(str(port))
+		portLine.setText(str(self.parent.port))
 		layout.addRow (portLabel,portLine)
 
 		prefixLabel = QLabel("Prefix")
@@ -314,11 +330,10 @@ class SetupTab(QWidget):
 		self.setLayout(layout)
 
 	def onChanged(self, text):
-		global ip
-		print (ip)
-		ip = text
-		print (ip)
-		self.parent.statusBar.showMessage("Address: {}".format((ip, port)))
+		print (self.parent.ip)
+		self.parent.ip = text
+		print (text)
+		self.parent.statusBar.showMessage("Address: {}".format((self.parent.ip, self.parent.port)))
 
 
 
@@ -430,25 +445,37 @@ class TTCKey ():
  
 class ServerThread (QThread):
 	def __init__(self):
-		QThread.__init__(self)
+		super().__init__()
 
 	def __del__(self):
 		self.wait()
 
 	def run(self):
-		server.serve()
-		loop.run_forever()
+		#server.serve()
+		#loop.run_forever()
+		print ("dgdfgdf")
+
+	# def quit(self):
+	# 	#self.server.stop()
+	# 	print (loop.is_running)
+	# 	loop.stop()
+	# 	#loop.close()
+	# 	print (loop.is_running)
+	# 	#self.terminate()
 
 if __name__ == '__main__':
 
-	import sys
+	
 
 	
 
-	dispatcher = dispatcher.Dispatcher()
-	loop = asyncio.get_event_loop()
-	server = osc_server.AsyncIOOSCUDPServer(
-		(ip, port), dispatcher, loop)
+	# dispatcher = dispatcher.Dispatcher()
+	# loop = asyncio.get_event_loop()
+	# server = osc_server.AsyncIOOSCUDPServer(
+	# 	(ip, port), dispatcher, loop)
+	#print (server)
+	#server.serve()
+	#loop.stop()
 	app = QApplication(sys.argv)
 	app.setStyle("plastique")
 	mainWin = MainWindow()
