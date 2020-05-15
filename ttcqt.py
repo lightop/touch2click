@@ -210,9 +210,14 @@ class MainWindow(QMainWindow):
 		#self.loop = asyncio.get_event_loop()
 		self.server = osc_server.AsyncIOOSCUDPServer((self.ip, self.port), dispatcher, loop)
 		self.server.serve()
-		self.servThread = ServerThread()
-		self.servThread.start()
+		#self.servThread = ServerThread()
+		#self.servThread.start()
 		#self.loop.run_forever()
+		#asyncio.set_event_loop(loop)
+
+		with loop:
+			loop.run_forever()
+
 		
 	def start2Server (self):
 		self.server2.start()
@@ -483,13 +488,13 @@ if __name__ == '__main__':
 	
 
 	dispatcher = dispatcher.Dispatcher()
-	loop = asyncio.get_event_loop()
 	# server = osc_server.AsyncIOOSCUDPServer(
 	# 	(ip, port), dispatcher, loop)
 	#print (server)
 	#server.serve()
 	#loop.stop()
 	app = QApplication(sys.argv)
+	loop = QEventLoop (app)
 	app.setStyle("plastique")
 	mainWin = MainWindow()
 
