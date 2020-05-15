@@ -79,7 +79,7 @@ class MainWindow(QMainWindow):
 	def __init__(self):
 		super(MainWindow, self).__init__()
 
-		self.setWindowTitle("Touch2Click v0.05")
+		self.setWindowTitle("Touch2Click v0.07")
 		self.resize(550,400)
 
 		self.times = 0
@@ -87,7 +87,7 @@ class MainWindow(QMainWindow):
 		self.ip = "127.0.0.1"
 		self.port = 8000
 
-		self.dispatcher = dispatcher.Dispatcher()
+		#self.dispatcher = dispatcher.Dispatcher()
 		# self.loop = asyncio.get_event_loop()
 		# self.server = osc_server.AsyncIOOSCUDPServer((ip, port), dispatcher, self.loop)
 
@@ -206,9 +206,12 @@ class MainWindow(QMainWindow):
 		self.show()
 
 	def startServer (self):
-		self.loop = asyncio.new_event_loop()
+		self.loop = asyncio.get_event_loop()
 		self.server = osc_server.AsyncIOOSCUDPServer((self.ip, self.port), dispatcher, self.loop)
 		self.server.serve()
+
+		self.servThread = ServerThread()
+		#self.loop.run_forever()
 		
 	def start2Server (self):
 		self.server2.start()
@@ -321,6 +324,7 @@ class SetupTab(QWidget):
 		portLabel = QLabel("Port")
 		portLine = QLineEdit()
 		portLine.setText(str(self.parent.port))
+		portLine.textChanged.connect(self.textChanged)
 		layout.addRow (portLabel,portLine)
 
 		prefixLabel = QLabel("Prefix")
@@ -334,6 +338,12 @@ class SetupTab(QWidget):
 		self.parent.ip = text
 		print (text)
 		self.parent.statusBar.showMessage("Address: {}".format((self.parent.ip, self.parent.port)))
+
+	def textChanged (self, text):
+		print (self.parent.port)
+		self.parent.port = text
+		self.parent.statusBar.showMessage("Address: {}".format((self.parent.ip, self.parent.port)))
+
 
 
 
@@ -377,6 +387,7 @@ class TTCFader ():
   def handler (self, unused_addr, args, volume):
     self.y_level = volume*self.y_size
     self.x_level = volume*self.x_size
+    print ("")
     pyautogui.moveTo(self.x_zero - self.x_level, self.y_zero-self.y_level)
     
 
@@ -452,7 +463,7 @@ class ServerThread (QThread):
 
 	def run(self):
 		#server.serve()
-		#loop.run_forever()
+		loop.run_forever()
 		print ("dgdfgdf")
 
 	# def quit(self):
@@ -469,7 +480,7 @@ if __name__ == '__main__':
 
 	
 
-	# dispatcher = dispatcher.Dispatcher()
+	dispatcher = dispatcher.Dispatcher()
 	# loop = asyncio.get_event_loop()
 	# server = osc_server.AsyncIOOSCUDPServer(
 	# 	(ip, port), dispatcher, loop)
