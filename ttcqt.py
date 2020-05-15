@@ -37,6 +37,7 @@ import asyncio
 #import netifaces
 import psutil
 import sys
+from asyncqt import QEventLoop, QThreadExecutor
 
 pyautogui.PAUSE = 0.01 #Vasya! Don't you ever forget about this!
 
@@ -206,11 +207,11 @@ class MainWindow(QMainWindow):
 		self.show()
 
 	def startServer (self):
-		self.loop = asyncio.get_event_loop()
-		self.server = osc_server.AsyncIOOSCUDPServer((self.ip, self.port), dispatcher, self.loop)
+		#self.loop = asyncio.get_event_loop()
+		self.server = osc_server.AsyncIOOSCUDPServer((self.ip, self.port), dispatcher, loop)
 		self.server.serve()
-
 		self.servThread = ServerThread()
+		self.servThread.start()
 		#self.loop.run_forever()
 		
 	def start2Server (self):
@@ -463,6 +464,7 @@ class ServerThread (QThread):
 
 	def run(self):
 		#server.serve()
+		print ("11111111111111111111")
 		loop.run_forever()
 		print ("dgdfgdf")
 
@@ -481,7 +483,7 @@ if __name__ == '__main__':
 	
 
 	dispatcher = dispatcher.Dispatcher()
-	# loop = asyncio.get_event_loop()
+	loop = asyncio.get_event_loop()
 	# server = osc_server.AsyncIOOSCUDPServer(
 	# 	(ip, port), dispatcher, loop)
 	#print (server)
